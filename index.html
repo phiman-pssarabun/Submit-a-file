@@ -286,7 +286,7 @@
                 <tr>
                     <th>วันที่เสนอ</th>
                     <th>รหัสแฟ้ม</th>
-                    <th>กลุ่มงาน / งาน</th>
+                    <th>กลุ่มงาน / กลุ่มสาระฯ</th>
                     <th>ผู้เสนอ</th>
                     <th>สถานะ / การดำเนินการ</th>
                 </tr>
@@ -321,7 +321,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label font-weight-bold">กลุ่มงาน / กลุ่มสาระฯ <span class="text-danger">*</span></label>
-                        <select id="newGroup" class="form-select" required>
+                        <select id="newGroup" class="form-select" onchange="toggleCustomGroupInput(this)" required>
                             <option value="">-- เลือกกลุ่มงาน / กลุ่มสาระ --</option>
                             <option value="กลุ่มบริหารวิชาการ">กลุ่มบริหารวิชาการ</option>
                             <option value="กลุ่มบริหารงบประมาณ">กลุ่มบริหารงบประมาณ</option>
@@ -335,18 +335,22 @@
                             <option value="กลุ่มสาระฯ ศิลปะ">กลุ่มสาระฯ ศิลปะ</option>
                             <option value="กลุ่มสาระฯ การงานอาชีพ">กลุ่มสาระฯ การงานอาชีพ</option>
                             <option value="กลุ่มสาระฯ ภาษาต่างประเทศ">กลุ่มสาระฯ ภาษาต่างประเทศ</option>
-                            <option value="งานอื่นๆ">งานอื่นๆ</option>
+                            <option value="other">อื่นๆ (ระบุเอง)</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label font-weight-bold">งาน / เรื่องที่เสนอประจำแฟ้ม <span class="text-danger">*</span></label>
-                        <input type="text" id="newJobName" class="form-control" placeholder="เช่น บันทึกข้อความขออนุมัติโครงการ..." required>
+
+                    <!-- ช่องกรอกชื่อกลุ่มงาน/กลุ่มสาระฯ กรณีเลือก "อื่นๆ" -->
+                    <div class="mb-3 d-none" id="customGroupGroup">
+                        <label class="form-label font-weight-bold">ระบุกลุ่มงาน / กลุ่มสาระฯ <span class="text-danger">*</span></label>
+                        <input type="text" id="customGroupName" class="form-control" placeholder="ระบุชื่อกลุ่มงาน หรือ กลุ่มสาระฯ">
                     </div>
+
+                    <!-- ซ่อนฟิลด์ newJobName เพื่อคงความเข้ากันได้กับ ID เดิม -->
+                    <input type="hidden" id="newJobName" value="-">
 
                     <!-- แสดง QR Code Card -->
                     <div id="printableQrCard" class="qr-print-card d-none">
                         <h5 class="font-weight-bold text-primary mb-1" id="previewGroup">กลุ่มงาน</h5>
-                        <p class="text-muted small mb-2" id="previewJob">เรื่องที่เสนอ</p>
                         <div id="qrcode" class="my-3"></div>
                         <h6 class="font-weight-bold mb-0" id="previewFolderId">รหัสแฟ้ม: F001</h6>
                         <small class="text-muted">สแกนเพื่อเสนอเซ็นแฟ้มผู้อำนวยการ</small>
@@ -380,10 +384,8 @@
                         <label class="form-label font-weight-bold">กลุ่มงาน / กลุ่มสาระฯ</label>
                         <input type="text" id="modalGroup" class="form-control bg-light" readonly>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label font-weight-bold">งาน / เรื่องที่เสนอ</label>
-                        <input type="text" id="modalJobName" class="form-control bg-light" readonly>
-                    </div>
+                    <!-- ซ่อน modalJobName ไว้เพื่อคง ID เดิม -->
+                    <input type="hidden" id="modalJobName" value="-">
                     <div class="mb-3">
                         <label class="form-label font-weight-bold">วันที่เสนออัตโนมัติ</label>
                         <input type="text" id="modalSubmitDate" class="form-control bg-light" readonly>
@@ -464,6 +466,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // ** ใส่ Web App URL ที่ได้จาก Apps Script ที่นี่ **
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzEmWnymTjdAShNGGuKfzAyZ515gSKl1kb6iR_uJ0ZAWF-ARj0nIU43QA21FNyLwnsM/exec";
 
     let allFolders = [];
@@ -500,8 +503,24 @@
 
     function clearSignature() { signaturePad.clear(); }
 
+    // ซ่อน/แสดง ช่องกรอกกลุ่มงานระบุเอง
+    function toggleCustomGroupInput(selectEl) {
+        const customGroupDiv = document.getElementById('customGroupGroup');
+        const customGroupInput = document.getElementById('customGroupName');
+        
+        if (selectEl.value === 'other') {
+            customGroupDiv.classList.remove('d-none');
+            customGroupInput.setAttribute('required', 'required');
+        } else {
+            customGroupDiv.classList.add('d-none');
+            customGroupInput.removeAttribute('required');
+            customGroupInput.value = '';
+        }
+    }
+
     function openCreateQrModal() {
         document.getElementById('createQrForm').reset();
+        document.getElementById('customGroupGroup').classList.add('d-none');
         document.getElementById('printableQrCard').classList.add('d-none');
         document.getElementById('btnPrintQr').classList.add('d-none');
         document.getElementById('btnGenQr').classList.remove('d-none');
@@ -513,8 +532,16 @@
     function generateQrCode(e) {
         e.preventDefault();
         const folderId = document.getElementById('newFolderId').value.trim();
-        const group = document.getElementById('newGroup').value;
-        const jobName = document.getElementById('newJobName').value.trim();
+        const selectGroup = document.getElementById('newGroup').value;
+        const customGroup = document.getElementById('customGroupName').value.trim();
+        
+        // เลือกชื่อกลุ่มงานตามที่เลือกในระบบหรือกรอกเอง
+        const finalGroup = selectGroup === 'other' ? customGroup : selectGroup;
+
+        if (!finalGroup) {
+            Swal.fire('คำเตือน', 'กรุณาระบุกลุ่มงาน/กลุ่มสาระฯ', 'warning');
+            return;
+        }
 
         Swal.fire({ title: 'กำลังสร้าง QR Code และลงทะเบียน...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
@@ -526,8 +553,8 @@
         const payload = {
             action: "createFolderMaster",
             folderId: folderId,
-            group: group,
-            jobName: jobName
+            group: finalGroup,
+            jobName: "-"
         };
 
         fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) })
@@ -544,8 +571,7 @@
                         height: 160
                     });
 
-                    document.getElementById('previewGroup').innerText = group;
-                    document.getElementById('previewJob').innerText = jobName;
+                    document.getElementById('previewGroup').innerText = finalGroup;
                     document.getElementById('previewFolderId').innerText = `รหัสแฟ้ม: ${folderId}`;
 
                     document.getElementById('printableQrCard').classList.remove('d-none');
@@ -602,7 +628,7 @@
                 <tr>
                     <td>${item.submitDate}</td>
                     <td class="font-weight-bold text-primary">${item.folderId}</td>
-                    <td><b>${item.group}</b><br><small class="text-muted">${item.jobName}</small></td>
+                    <td><b>${item.group}</b></td>
                     <td>${item.submitter}</td>
                     <td>
                         <div>${statusBadge}</div>
@@ -618,7 +644,6 @@
                         ${statusBadge}
                     </div>
                     <div class="folder-detail"><i class="fas fa-layer-group"></i><b>กลุ่มงาน:</b> ${item.group}</div>
-                    <div class="folder-detail"><i class="fas fa-tasks"></i><b>งาน:</b> ${item.jobName}</div>
                     <div class="folder-detail"><i class="fas fa-user"></i><b>ผู้เสนอ:</b> ${item.submitter}</div>
                     <div class="folder-detail"><i class="fas fa-calendar-alt"></i><b>วันที่เสนอ:</b> ${item.submitDate}</div>
                     <div class="mt-2 text-end">${actionBtn}</div>
@@ -661,7 +686,6 @@
                     } else {
                         document.getElementById('modalFolderId').value = info.folderId;
                         document.getElementById('modalGroup').value = info.group;
-                        document.getElementById('modalJobName').value = info.jobName;
                         document.getElementById('modalSubmitDate').value = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                         document.getElementById('modalSubmitter').value = "";
                         submitModalObj.show();
@@ -680,7 +704,7 @@
             action: "submitFolder",
             folderId: document.getElementById('modalFolderId').value,
             group: document.getElementById('modalGroup').value,
-            jobName: document.getElementById('modalJobName').value,
+            jobName: "-",
             submitter: document.getElementById('modalSubmitter').value.trim()
         };
 
