@@ -89,35 +89,43 @@
             font-weight: 500;
         }
 
-        /* Header Buttons Container */
+        /* Header Buttons Container: มือถือให้เรียงแนวตั้ง (2 บรรทัด) คอมพิวเตอร์เรียงแถวเดียว */
         .header-actions {
             display: flex;
+            flex-direction: column;
             gap: 8px;
             width: 100%;
-            align-items: center;
         }
 
-        @media (min-width: 640px) {
+        @media (min-width: 768px) {
             .header-actions {
+                flex-direction: row;
                 width: auto;
+                align-items: center;
             }
         }
 
-        /* Adjusted Buttons Style with No-Wrap */
+        /* Buttons Style */
         .btn-add-qr, .btn-history {
-            flex: 1;
-            padding: 9px 14px;
+            width: 100%;
+            padding: 10px 16px;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 0.84rem;
+            font-size: 0.88rem;
             border: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             transition: all 0.2s;
             box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-            white-space: nowrap; /* ป้องกันข้อความขึ้นบรรทัดใหม่ */
+            white-space: nowrap;
+        }
+
+        @media (min-width: 768px) {
+            .btn-add-qr, .btn-history {
+                width: auto;
+            }
         }
 
         .btn-add-qr { background: var(--main-gradient); color: white; }
