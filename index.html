@@ -89,7 +89,7 @@
             font-weight: 500;
         }
 
-        /* Header Buttons Container: มือถือให้เรียงแนวตั้ง (2 บรรทัด) คอมพิวเตอร์เรียงแถวเดียว */
+        /* Header Buttons Container */
         .header-actions {
             display: flex;
             flex-direction: column;
@@ -343,6 +343,41 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
+        /* Pagination Styling */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 14px;
+            margin-top: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pagination-info {
+            font-size: 0.82rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .pagination .page-link {
+            border-radius: 8px;
+            margin: 0 2px;
+            color: var(--primary);
+            font-size: 0.82rem;
+            padding: 6px 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
         @media print {
             body * { visibility: hidden; }
             #printableQrCard, #printableQrCard * { visibility: visible; }
@@ -415,6 +450,14 @@
 
     <!-- Cards Container (Mobile) -->
     <div id="folderCardBody" class="mobile-card-container"></div>
+
+    <!-- Pagination for Main List -->
+    <div id="mainPagination" class="pagination-container d-none">
+        <div id="mainPaginationInfo" class="pagination-info">แสดงรายการ 1 - 15 จากทั้งหมด 0 รายการ</div>
+        <nav>
+            <ul id="mainPaginationNav" class="pagination pagination-sm mb-0"></ul>
+        </nav>
+    </div>
 </div>
 
 <!-- Modal History: ประวัติย้อนหลัง -->
@@ -457,6 +500,14 @@
                 <div id="historyCardBody" class="mobile-card-container" style="max-height: 450px; overflow-y: auto;">
                     <div class="text-center py-4 text-muted">กำลังโหลดประวัติ...</div>
                 </div>
+
+                <!-- Pagination for History List -->
+                <div id="historyPagination" class="pagination-container d-none">
+                    <div id="historyPaginationInfo" class="pagination-info">แสดงประวัติ 1 - 15 จากทั้งหมด 0 รายการ</div>
+                    <nav>
+                        <ul id="historyPaginationNav" class="pagination pagination-sm mb-0"></ul>
+                    </nav>
+                </div>
             </div>
         </div>
     </div>
@@ -484,6 +535,7 @@
                             <option value="กลุ่มบริหารงบประมาณ">กลุ่มบริหารงบประมาณ</option>
                             <option value="กลุ่มบริหารบุคคล">กลุ่มบริหารบุคคล</option>
                             <option value="กลุ่มบริหารทั่วไป">กลุ่มบริหารทั่วไป</option>
+                            <option value="กลุ่มบริหารทั่วไป">กลุ่มกิจการนักเรียน</option>
                             <option value="กลุ่มสาระฯ ภาษาไทย">กลุ่มสาระฯ ภาษาไทย</option>
                             <option value="กลุ่มสาระฯ คณิตศาสตร์">กลุ่มสาระฯ คณิตศาสตร์</option>
                             <option value="กลุ่มสาระฯ วิทยาศาสตร์และเทคโนโลยี">กลุ่มสาระฯ วิทยาศาสตร์และเทคโนโลยี</option>
@@ -492,6 +544,7 @@
                             <option value="กลุ่มสาระฯ ศิลปะ">กลุ่มสาระฯ ศิลปะ</option>
                             <option value="กลุ่มสาระฯ การงานอาชีพ">กลุ่มสาระฯ การงานอาชีพ</option>
                             <option value="กลุ่มสาระฯ ภาษาต่างประเทศ">กลุ่มสาระฯ ภาษาต่างประเทศ</option>
+                            <option value="กลุ่มสาระฯ ภาษาต่างประเทศ">แนะแนว</option>
                             <option value="other">อื่นๆ (ระบุเอง)</option>
                         </select>
                     </div>
@@ -626,8 +679,16 @@
     // ** ใส่ Web App URL ที่ได้จาก Apps Script ที่นี่ **
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzEmWnymTjdAShNGGuKfzAyZ515gSKl1kb6iR_uJ0ZAWF-ARj0nIU43QA21FNyLwnsM/exec";
 
+    const PAGE_SIZE = 15; // แสดงผล 15 รายการต่อหน้า
+
     let allFolders = [];
+    let filteredFolders = [];
+    let currentMainPage = 1;
+
     let allHistoryData = [];
+    let filteredHistoryData = [];
+    let currentHistoryPage = 1;
+
     let createQrModalObj, submitModalObj, outDateModalObj, returnModalObj, historyModalObj;
     let signaturePad;
 
@@ -737,7 +798,7 @@
             .then(res => {
                 if(res.status === "success") {
                     allFolders = res.data;
-                    renderFolders(allFolders);
+                    filterFolders();
                 }
             })
             .catch(() => {
@@ -745,21 +806,51 @@
             });
     }
 
-    function renderFolders(data) {
+    function filterFolders() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const statusVal = document.getElementById('statusFilter').value;
+
+        filteredFolders = allFolders.filter(item => {
+            const matchSearch = (
+                item.folderId.toLowerCase().includes(searchText) ||
+                item.group.toLowerCase().includes(searchText) ||
+                item.submitter.toLowerCase().includes(searchText)
+            );
+            const matchStatus = statusVal === "" || item.status === statusVal;
+            return matchSearch && matchStatus;
+        });
+
+        currentMainPage = 1;
+        renderMainPage();
+    }
+
+    function renderMainPage() {
         const tableBody = document.getElementById('folderTableBody');
         const cardBody = document.getElementById('folderCardBody');
+        const paginationContainer = document.getElementById('mainPagination');
 
-        if (!data || data.length === 0) {
+        if (!filteredFolders || filteredFolders.length === 0) {
             const emptyHtml = `<div class="text-center py-5 text-muted bg-white rounded-4 shadow-sm p-4"><i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i><p class="mb-0 fs-6">ไม่มีรายการเสนอเซ็นแฟ้มในขณะนี้</p></div>`;
             tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">ไม่มีรายการเสนอเซ็นแฟ้มในขณะนี้</td></tr>`;
             cardBody.innerHTML = emptyHtml;
+            paginationContainer.classList.add('d-none');
             return;
         }
+
+        const totalItems = filteredFolders.length;
+        const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+
+        if (currentMainPage < 1) currentMainPage = 1;
+        if (currentMainPage > totalPages) currentMainPage = totalPages;
+
+        const startIdx = (currentMainPage - 1) * PAGE_SIZE;
+        const endIdx = Math.min(startIdx + PAGE_SIZE, totalItems);
+        const pageItems = filteredFolders.slice(startIdx, endIdx);
 
         let tableHtml = "";
         let cardHtml = "";
 
-        data.forEach(item => {
+        pageItems.forEach(item => {
             const isFinished = item.status === "พิจารณาเรียบร้อยแล้ว";
             const statusBadge = isFinished 
                 ? `<span class="badge-status bg-success-custom"><i class="fas fa-check-circle"></i> พิจารณาแล้ว (${item.outDate || '-'})</span>`
@@ -772,7 +863,6 @@
                 actionBtn = `<button class="btn-action-return" onclick="openReturnModal(${item.rowIndex})"><i class="fas fa-hand-holding me-1"></i>รับแฟ้มคืน</button>`;
             }
 
-            // Desktop Table
             tableHtml += `
                 <tr>
                     <td>${item.submitDate}</td>
@@ -786,7 +876,6 @@
                 </tr>
             `;
 
-            // Mobile Card
             cardHtml += `
                 <div class="folder-card">
                     <div class="folder-card-header">
@@ -803,23 +892,27 @@
 
         tableBody.innerHTML = tableHtml;
         cardBody.innerHTML = cardHtml;
+
+        // Render Pagination Control
+        if (totalPages > 1) {
+            paginationContainer.classList.remove('d-none');
+            document.getElementById('mainPaginationInfo').innerText = `แสดงรายการ ${startIdx + 1} - ${endIdx} จากทั้งหมด ${totalItems} รายการ`;
+            
+            let navHtml = `<li class="page-item ${currentMainPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeMainPage(${currentMainPage - 1}); return false;">ก่อนหน้า</a></li>`;
+            for (let i = 1; i <= totalPages; i++) {
+                navHtml += `<li class="page-item ${i === currentMainPage ? 'active' : ''}"><a class="page-link" href="#" onclick="changeMainPage(${i}); return false;">${i}</a></li>`;
+            }
+            navHtml += `<li class="page-item ${currentMainPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeMainPage(${currentMainPage + 1}); return false;">ถัดไป</a></li>`;
+            
+            document.getElementById('mainPaginationNav').innerHTML = navHtml;
+        } else {
+            paginationContainer.classList.add('d-none');
+        }
     }
 
-    function filterFolders() {
-        const searchText = document.getElementById('searchInput').value.toLowerCase();
-        const statusVal = document.getElementById('statusFilter').value;
-
-        const filtered = allFolders.filter(item => {
-            const matchSearch = (
-                item.folderId.toLowerCase().includes(searchText) ||
-                item.group.toLowerCase().includes(searchText) ||
-                item.submitter.toLowerCase().includes(searchText)
-            );
-            const matchStatus = statusVal === "" || item.status === statusVal;
-            return matchSearch && matchStatus;
-        });
-
-        renderFolders(filtered);
+    function changeMainPage(page) {
+        currentMainPage = page;
+        renderMainPage();
     }
 
     /* ---- ระบบประวัติย้อนหลัง ---- */
@@ -831,13 +924,14 @@
     function fetchHistory() {
         document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังโหลดประวัติ...</td></tr>`;
         document.getElementById('historyCardBody').innerHTML = `<div class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังโหลดประวัติ...</div>`;
+        document.getElementById('historyPagination').classList.add('d-none');
 
         fetch(`${GAS_URL}?action=getAllHistory`)
             .then(res => res.json())
             .then(res => {
                 if (res.status === "success") {
                     allHistoryData = res.data;
-                    renderHistory(allHistoryData);
+                    filterHistory();
                 }
             })
             .catch(() => {
@@ -846,21 +940,49 @@
             });
     }
 
-    function renderHistory(data) {
+    function filterHistory() {
+        const searchText = document.getElementById('historySearchInput').value.toLowerCase();
+        filteredHistoryData = allHistoryData.filter(item => {
+            return (
+                item.folderId.toLowerCase().includes(searchText) ||
+                item.group.toLowerCase().includes(searchText) ||
+                item.submitter.toLowerCase().includes(searchText) ||
+                item.receiverName.toLowerCase().includes(searchText) ||
+                item.submitDate.toLowerCase().includes(searchText)
+            );
+        });
+
+        currentHistoryPage = 1;
+        renderHistoryPage();
+    }
+
+    function renderHistoryPage() {
         const tbody = document.getElementById('historyTableBody');
         const cardBody = document.getElementById('historyCardBody');
+        const paginationContainer = document.getElementById('historyPagination');
 
-        if (!data || data.length === 0) {
+        if (!filteredHistoryData || filteredHistoryData.length === 0) {
             const emptyText = `ไม่พบประวัติการเสนอเซ็นในช่วง 1 เดือนย้อนหลัง`;
             tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">${emptyText}</td></tr>`;
             cardBody.innerHTML = `<div class="text-center py-4 text-muted">${emptyText}</div>`;
+            paginationContainer.classList.add('d-none');
             return;
         }
+
+        const totalItems = filteredHistoryData.length;
+        const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+
+        if (currentHistoryPage < 1) currentHistoryPage = 1;
+        if (currentHistoryPage > totalPages) currentHistoryPage = totalPages;
+
+        const startIdx = (currentHistoryPage - 1) * PAGE_SIZE;
+        const endIdx = Math.min(startIdx + PAGE_SIZE, totalItems);
+        const pageItems = filteredHistoryData.slice(startIdx, endIdx);
 
         let tableHtml = "";
         let cardHtml = "";
 
-        data.forEach(item => {
+        pageItems.forEach(item => {
             let statusBadge = `<span class="badge-status bg-returned"><i class="fas fa-check-double"></i> คืนแล้ว</span>`;
             if (item.status === "เสนอผู้อำนวยการเพื่อพิจารณา") {
                 statusBadge = `<span class="badge-status bg-pending"><i class="fas fa-clock"></i> กำลังเสนอ ผอ.</span>`;
@@ -872,7 +994,6 @@
                 ? `<button class="btn btn-sm btn-outline-primary py-1 px-2 text-nowrap fs-7" onclick="viewSignature('${item.signature}')"><i class="fas fa-file-signature me-1"></i>ดูลายเซ็น</button>` 
                 : `<span class="text-muted small">-</span>`;
 
-            // Table Row
             tableHtml += `
                 <tr>
                     <td class="font-weight-bold text-primary">${item.folderId}</td>
@@ -886,7 +1007,6 @@
                 </tr>
             `;
 
-            // Card Item for Mobile History
             cardHtml += `
                 <div class="history-card-item">
                     <div class="history-card-header">
@@ -907,20 +1027,27 @@
 
         tbody.innerHTML = tableHtml;
         cardBody.innerHTML = cardHtml;
+
+        // Render Pagination Control for History
+        if (totalPages > 1) {
+            paginationContainer.classList.remove('d-none');
+            document.getElementById('historyPaginationInfo').innerText = `แสดงประวัติ ${startIdx + 1} - ${endIdx} จากทั้งหมด ${totalItems} รายการ`;
+            
+            let navHtml = `<li class="page-item ${currentHistoryPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeHistoryPage(${currentHistoryPage - 1}); return false;">ก่อนหน้า</a></li>`;
+            for (let i = 1; i <= totalPages; i++) {
+                navHtml += `<li class="page-item ${i === currentHistoryPage ? 'active' : ''}"><a class="page-link" href="#" onclick="changeHistoryPage(${i}); return false;">${i}</a></li>`;
+            }
+            navHtml += `<li class="page-item ${currentHistoryPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeHistoryPage(${currentHistoryPage + 1}); return false;">ถัดไป</a></li>`;
+            
+            document.getElementById('historyPaginationNav').innerHTML = navHtml;
+        } else {
+            paginationContainer.classList.add('d-none');
+        }
     }
 
-    function filterHistory() {
-        const searchText = document.getElementById('historySearchInput').value.toLowerCase();
-        const filtered = allHistoryData.filter(item => {
-            return (
-                item.folderId.toLowerCase().includes(searchText) ||
-                item.group.toLowerCase().includes(searchText) ||
-                item.submitter.toLowerCase().includes(searchText) ||
-                item.receiverName.toLowerCase().includes(searchText) ||
-                item.submitDate.toLowerCase().includes(searchText)
-            );
-        });
-        renderHistory(filtered);
+    function changeHistoryPage(page) {
+        currentHistoryPage = page;
+        renderHistoryPage();
     }
 
     function viewSignature(sigBase64) {
