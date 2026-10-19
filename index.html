@@ -20,6 +20,7 @@
             --primary-hover: #154360;
             --bg: #f8fafc;
             --main-gradient: linear-gradient(135deg, #1a5276, #2980b9);
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         body, html {
@@ -27,29 +28,30 @@
             margin: 0; padding: 0;
             font-family: 'Prompt', sans-serif;
             background-color: var(--bg);
-            color: #333;
+            color: #334155;
             -webkit-tap-highlight-color: transparent;
         }
 
         .container-custom {
             max-width: 1050px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 12px;
             padding-bottom: 40px;
         }
 
+        /* Header UI */
         .page-header {
             background: white;
             border-bottom: 4px solid var(--primary);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            padding: 15px;
-            border-radius: 16px;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            padding: 16px;
+            border-radius: 18px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
         .header-title {
@@ -59,24 +61,25 @@
         }
 
         .header-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
             background: var(--main-gradient);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
-            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.2);
+            font-size: 1.3rem;
+            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.25);
+            flex-shrink: 0;
         }
 
         .header-text h1 {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--primary);
             margin: 0;
-            line-height: 1.2;
+            line-height: 1.3;
         }
 
         .header-text p {
@@ -89,84 +92,77 @@
         .header-actions {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
+            width: 100%;
         }
 
-        .btn-add-qr {
-            background: var(--main-gradient);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
+        @media (min-width: 576px) {
+            .header-actions { width: auto; }
+        }
+
+        .btn-add-qr, .btn-history {
+            flex: 1;
+            padding: 9px 14px;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 0.88rem;
-            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.2);
-            transition: all 0.2s;
+            font-size: 0.85rem;
+            border: none;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-        }
-
-        .btn-history {
-            background: #475569;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.88rem;
-            box-shadow: 0 4px 10px rgba(71, 85, 105, 0.2);
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
         }
 
-        .btn-add-qr:hover, .btn-history:hover {
-            opacity: 0.95;
-            color: white;
-            transform: translateY(-1px);
+        .btn-add-qr { background: var(--main-gradient); color: white; }
+        .btn-history { background: #475569; color: white; }
+
+        .btn-add-qr:active, .btn-history:active {
+            transform: scale(0.98);
         }
 
         /* Filter Card */
         .filter-card {
             background: white;
-            border-radius: 14px;
-            padding: 15px;
+            border-radius: 16px;
+            padding: 14px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-control, .form-select {
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #cbd5e1;
-            font-size: 0.9rem;
-            padding: 8px 12px;
+            font-size: 0.88rem;
+            padding: 9px 12px;
         }
 
         .form-control:focus, .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.15);
+            box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.12);
         }
 
         /* Status Badges */
         .badge-status {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 20px;
-            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            line-height: 1.4;
         }
         .bg-pending { background-color: #fef3c7; color: #92400e; }
         .bg-success-custom { background-color: #d1fae5; color: #065f46; }
-        .bg-returned { background-color: #e2e8f0; color: #334155; }
+        .bg-returned { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
 
         /* Responsive View: Table for Desktop & Cards for Mobile */
         .desktop-table-container {
             display: block;
             background: white;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
             overflow: hidden;
         }
 
@@ -180,81 +176,146 @@
         /* Table Style */
         .table-custom { width: 100%; margin-bottom: 0; }
         .table-custom th {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: var(--primary);
             font-weight: 700;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             border-bottom: 2px solid #e2e8f0;
             padding: 12px;
         }
         .table-custom td {
             vertical-align: middle;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        /* Card Style for Mobile */
+        /* Mobile Card Styling */
         .folder-card {
             background: white;
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 15px;
             margin-bottom: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            box-shadow: var(--card-shadow);
+            border: 1px solid #f1f5f9;
             border-left: 5px solid var(--primary);
+            position: relative;
         }
+
+        .folder-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
         .folder-card-title {
             font-weight: 700;
             color: var(--primary);
-            font-size: 1rem;
-            margin-bottom: 6px;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
         }
-        .folder-detail {
-            font-size: 0.85rem;
+
+        .folder-detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.84rem;
             color: #475569;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            line-height: 1.4;
         }
-        .folder-detail i { width: 18px; color: var(--primary); }
 
-        /* Buttons */
-        .btn-action-return {
-            background-color: #059669; color: white; border: none;
-            padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;
-            transition: all 0.2s; margin-top: 5px;
+        .folder-detail-row i {
+            width: 18px;
+            color: var(--primary);
+            margin-top: 3px;
+            flex-shrink: 0;
+            text-align: center;
         }
-        .btn-action-return:hover { background-color: #047857; color: white; }
 
-        .btn-action-out {
-            background-color: #d97706; color: white; border: none;
-            padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;
+        .folder-card-actions {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
         }
-        .btn-action-out:hover { background-color: #b45309; color: white; }
 
-        /* Modal Custom Style */
-        .modal-content { border-radius: 16px; border: none; overflow: hidden; }
-        .modal-header { background: var(--main-gradient); color: white; border: none; }
+        /* Action Buttons */
+        .btn-action-return, .btn-action-out {
+            width: 100%;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .btn-action-return { background-color: #059669; color: white; }
+        .btn-action-out { background-color: #d97706; color: white; }
+
+        @media (min-width: 576px) {
+            .btn-action-return, .btn-action-out { width: auto; }
+        }
+
+        /* History Cards for Mobile Modal */
+        .history-card-item {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 13px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .history-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        /* Modal Layout */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .modal-header { background: var(--main-gradient); color: white; border: none; padding: 14px 18px; }
         .modal-header .btn-close { filter: brightness(0) invert(1); }
 
         #signature-pad {
             border: 2px dashed #cbd5e1;
-            border-radius: 10px;
+            border-radius: 12px;
             background-color: #fafafa;
             width: 100%; height: 180px;
             touch-action: none;
         }
 
-        /* QR Code Card Print Area */
         .qr-print-card {
             border: 2px dashed var(--primary);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 18px;
             text-align: center;
             background: #f8fafc;
         }
         #qrcode img {
             margin: 0 auto;
             border: 4px solid white;
-            border-radius: 8px;
+            border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
@@ -332,36 +393,45 @@
     <div id="folderCardBody" class="mobile-card-container"></div>
 </div>
 
-<!-- Modal History: ประวัติการเสนอเซ็นย้อนหลัง 1 เดือน -->
+<!-- Modal History: ประวัติย้อนหลัง -->
 <div class="modal fade" id="historyModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold"><i class="fas fa-history me-2"></i>ประวัติการเสนอเซ็นแฟ้มย้อนหลัง 1 เดือน</h5>
+                <h5 class="modal-title font-weight-bold fs-6"><i class="fas fa-history me-2"></i>ประวัติเสนอเซ็นย้อนหลัง 1 เดือน</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-3">
                 <div class="mb-3">
-                    <input type="text" id="historySearchInput" class="form-control" placeholder="พิมพ์เพื่อค้นหาประวัติ (เช่น พิมพ์รหัสแฟ้ม F001, กลุ่มงาน, ผู้เสนอ, ผู้รับ)..." onkeyup="filterHistory()">
+                    <input type="text" id="historySearchInput" class="form-control" placeholder="พิมพ์เพื่อค้นหาประวัติ (เช่น F001, กลุ่มงาน, ผู้เสนอ)..." onkeyup="filterHistory()">
                 </div>
-                <div class="table-responsive" style="max-height: 450px;">
-                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th>รหัสแฟ้ม</th>
-                                <th>รอบที่</th>
-                                <th>กลุ่มงาน</th>
-                                <th>วันที่เสนอ / ผู้เสนอ</th>
-                                <th>วันที่ออกห้อง ผอ.</th>
-                                <th>ผู้รับคืน / วันที่รับ</th>
-                                <th>สถานะล่าสุด</th>
-                                <th>ลายเซ็น</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr><td colspan="8" class="text-center py-4 text-muted">กำลังโหลดประวัติ...</td></tr>
-                        </tbody>
-                    </table>
+                
+                <!-- Desktop Table View -->
+                <div class="desktop-table-container">
+                    <div class="table-responsive" style="max-height: 420px;">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>รหัสแฟ้ม</th>
+                                    <th>รอบที่</th>
+                                    <th>กลุ่มงาน</th>
+                                    <th>วันที่เสนอ / ผู้เสนอ</th>
+                                    <th>วันที่ออกห้อง ผอ.</th>
+                                    <th>ผู้รับคืน / วันที่รับ</th>
+                                    <th>สถานะล่าสุด</th>
+                                    <th>ลายเซ็น</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr><td colspan="8" class="text-center py-4 text-muted">กำลังโหลดประวัติ...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Mobile Cards View for History -->
+                <div id="historyCardBody" class="mobile-card-container" style="max-height: 450px; overflow-y: auto;">
+                    <div class="text-center py-4 text-muted">กำลังโหลดประวัติ...</div>
                 </div>
             </div>
         </div>
@@ -373,7 +443,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold"><i class="fas fa-qrcode me-2"></i>สร้าง QR Code ประจำแฟ้ม</h5>
+                <h5 class="modal-title font-weight-bold fs-6"><i class="fas fa-qrcode me-2"></i>สร้าง QR Code ประจำแฟ้ม</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="createQrForm" onsubmit="generateQrCode(event)">
@@ -431,7 +501,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold"><i class="fas fa-file-signature me-2"></i>ลงทะเบียนเสนอเซ็นแฟ้ม</h5>
+                <h5 class="modal-title font-weight-bold fs-6"><i class="fas fa-file-signature me-2"></i>ลงทะเบียนเสนอเซ็นแฟ้ม</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="submitForm" onsubmit="saveSubmitFolder(event)">
@@ -496,7 +566,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold"><i class="fas fa-box-open me-2"></i>บันทึกรับแฟ้มคืน</h5>
+                <h5 class="modal-title font-weight-bold fs-6"><i class="fas fa-box-open me-2"></i>บันทึกรับแฟ้มคืน</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="returnForm" onsubmit="saveReturnFolder(event)">
@@ -604,7 +674,7 @@
             return;
         }
 
-        Swal.fire({ title: 'กำลังสร้าง QR Code และลงทะเบียน...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'กำลังสร้าง QR Code...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const currentBaseUrl = window.location.href.split('?')[0];
         const qrUrl = `${currentBaseUrl}?folderId=${encodeURIComponent(folderId)}`;
@@ -656,7 +726,7 @@
         const cardBody = document.getElementById('folderCardBody');
 
         if (!data || data.length === 0) {
-            const emptyHtml = `<div class="text-center py-5 text-muted"><i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i><p>ไม่มีรายการเสนอเซ็นแฟ้มในขณะนี้</p></div>`;
+            const emptyHtml = `<div class="text-center py-5 text-muted bg-white rounded-4 shadow-sm p-4"><i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i><p class="mb-0 fs-6">ไม่มีรายการเสนอเซ็นแฟ้มในขณะนี้</p></div>`;
             tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">ไม่มีรายการเสนอเซ็นแฟ้มในขณะนี้</td></tr>`;
             cardBody.innerHTML = emptyHtml;
             return;
@@ -668,8 +738,8 @@
         data.forEach(item => {
             const isFinished = item.status === "พิจารณาเรียบร้อยแล้ว";
             const statusBadge = isFinished 
-                ? `<span class="badge-status bg-success-custom"><i class="fas fa-check-circle me-1"></i>พิจารณาเรียบร้อยแล้ว (${item.outDate || '-'})</span>`
-                : `<span class="badge-status bg-pending"><i class="fas fa-clock me-1"></i>เสนอผู้อำนวยการเพื่อพิจารณา</span>`;
+                ? `<span class="badge-status bg-success-custom"><i class="fas fa-check-circle"></i> พิจารณาแล้ว (${item.outDate || '-'})</span>`
+                : `<span class="badge-status bg-pending"><i class="fas fa-clock"></i> เสนอ ผอ. เพื่อพิจารณา</span>`;
 
             let actionBtn = "";
             if (!isFinished) {
@@ -678,6 +748,7 @@
                 actionBtn = `<button class="btn-action-return" onclick="openReturnModal(${item.rowIndex})"><i class="fas fa-hand-holding me-1"></i>รับแฟ้มคืน</button>`;
             }
 
+            // Desktop Table
             tableHtml += `
                 <tr>
                     <td>${item.submitDate}</td>
@@ -691,16 +762,17 @@
                 </tr>
             `;
 
+            // Mobile Card
             cardHtml += `
                 <div class="folder-card">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="folder-card-title">${item.folderId}</span>
+                    <div class="folder-card-header">
+                        <span class="folder-card-title"><i class="fas fa-folder me-1 text-primary"></i>${item.folderId}</span>
                         ${statusBadge}
                     </div>
-                    <div class="folder-detail"><i class="fas fa-layer-group"></i><b>กลุ่มงาน:</b> ${item.group}</div>
-                    <div class="folder-detail"><i class="fas fa-user"></i><b>ผู้เสนอ:</b> ${item.submitter}</div>
-                    <div class="folder-detail"><i class="fas fa-calendar-alt"></i><b>วันที่เสนอ:</b> ${item.submitDate}</div>
-                    <div class="mt-2 text-end">${actionBtn}</div>
+                    <div class="folder-detail-row"><i class="fas fa-layer-group"></i><div><b>กลุ่มงาน:</b> ${item.group}</div></div>
+                    <div class="folder-detail-row"><i class="fas fa-user"></i><div><b>ผู้เสนอ:</b> ${item.submitter}</div></div>
+                    <div class="folder-detail-row"><i class="fas fa-calendar-alt"></i><div><b>วันที่เสนอ:</b> ${item.submitDate}</div></div>
+                    <div class="folder-card-actions">${actionBtn}</div>
                 </div>
             `;
         });
@@ -726,14 +798,15 @@
         renderFolders(filtered);
     }
 
-    /* ---- ระบบประวัติย้อนหลัง 1 เดือน ---- */
+    /* ---- ระบบประวัติย้อนหลัง ---- */
     function openHistoryModal() {
         historyModalObj.show();
         fetchHistory();
     }
 
     function fetchHistory() {
-        document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังดึงข้อมูลประวัติย้อนหลัง 1 เดือน...</td></tr>`;
+        document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังโหลดประวัติ...</td></tr>`;
+        document.getElementById('historyCardBody').innerHTML = `<div class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังโหลดประวัติ...</div>`;
 
         fetch(`${GAS_URL}?action=getAllHistory`)
             .then(res => res.json())
@@ -745,30 +818,38 @@
             })
             .catch(() => {
                 document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="8" class="text-center text-danger">เกิดข้อผิดพลาดในการโหลดประวัติ</td></tr>`;
+                document.getElementById('historyCardBody').innerHTML = `<div class="text-center py-3 text-danger">เกิดข้อผิดพลาดในการโหลดประวัติ</div>`;
             });
     }
 
     function renderHistory(data) {
         const tbody = document.getElementById('historyTableBody');
+        const cardBody = document.getElementById('historyCardBody');
+
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">ไม่พบประวัติการเสนอเซ็นในช่วง 1 เดือนย้อนหลัง</td></tr>`;
+            const emptyText = `ไม่พบประวัติการเสนอเซ็นในช่วง 1 เดือนย้อนหลัง`;
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">${emptyText}</td></tr>`;
+            cardBody.innerHTML = `<div class="text-center py-4 text-muted">${emptyText}</div>`;
             return;
         }
 
-        let html = "";
+        let tableHtml = "";
+        let cardHtml = "";
+
         data.forEach(item => {
-            let statusBadge = `<span class="badge-status bg-returned">คืนแล้ว (${item.receiveDate})</span>`;
+            let statusBadge = `<span class="badge-status bg-returned"><i class="fas fa-check-double"></i> คืนแล้ว</span>`;
             if (item.status === "เสนอผู้อำนวยการเพื่อพิจารณา") {
-                statusBadge = `<span class="badge-status bg-pending">กำลังเสนอ ผอ.</span>`;
+                statusBadge = `<span class="badge-status bg-pending"><i class="fas fa-clock"></i> กำลังเสนอ ผอ.</span>`;
             } else if (item.status === "พิจารณาเรียบร้อยแล้ว") {
-                statusBadge = `<span class="badge-status bg-success-custom">พิจารณาแล้ว (รอคืน)</span>`;
+                statusBadge = `<span class="badge-status bg-success-custom"><i class="fas fa-check-circle"></i> พิจารณาแล้ว</span>`;
             }
 
             const sigBtn = item.signature 
-                ? `<button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="viewSignature('${item.signature}')"><i class="fas fa-file-signature"></i> ดู</button>` 
-                : `-`;
+                ? `<button class="btn btn-sm btn-outline-primary py-1 px-2 text-nowrap fs-7" onclick="viewSignature('${item.signature}')"><i class="fas fa-file-signature me-1"></i>ดูลายเซ็น</button>` 
+                : `<span class="text-muted small">-</span>`;
 
-            html += `
+            // Table Row
+            tableHtml += `
                 <tr>
                     <td class="font-weight-bold text-primary">${item.folderId}</td>
                     <td class="text-center"><span class="badge bg-light text-dark border">รอบที่ ${item.currentCycle || 1}</span></td>
@@ -780,9 +861,28 @@
                     <td>${sigBtn}</td>
                 </tr>
             `;
+
+            // Card Item for Mobile History
+            cardHtml += `
+                <div class="history-card-item">
+                    <div class="history-card-header">
+                        <div>
+                            <span class="font-weight-bold text-primary fs-6 me-1">${item.folderId}</span>
+                            <span class="badge bg-light text-dark border small">รอบที่ ${item.currentCycle || 1}</span>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="folder-detail-row"><i class="fas fa-layer-group"></i><div><b>กลุ่มงาน:</b> ${item.group}</div></div>
+                    <div class="folder-detail-row"><i class="fas fa-user-edit"></i><div><b>ผู้เสนอ:</b> ${item.submitter} (${item.submitDate})</div></div>
+                    ${item.outDate ? `<div class="folder-detail-row"><i class="fas fa-calendar-check"></i><div><b>วันที่ออกห้อง ผอ.:</b> ${item.outDate}</div></div>` : ''}
+                    <div class="folder-detail-row"><i class="fas fa-user-check"></i><div><b>ผู้รับคืน:</b> ${item.receiverName} ${item.receiveDate !== '-' ? `(${item.receiveDate})` : ''}</div></div>
+                    ${item.signature ? `<div class="text-end mt-2">${sigBtn}</div>` : ''}
+                </div>
+            `;
         });
 
-        tbody.innerHTML = html;
+        tbody.innerHTML = tableHtml;
+        cardBody.innerHTML = cardHtml;
     }
 
     function filterHistory() {
