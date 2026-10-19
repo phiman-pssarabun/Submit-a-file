@@ -566,6 +566,7 @@
                             <option value="กลุ่มบริหารงบประมาณ">กลุ่มบริหารงบประมาณ</option>
                             <option value="กลุ่มบริหารบุคคล">กลุ่มบริหารบุคคล</option>
                             <option value="กลุ่มบริหารทั่วไป">กลุ่มบริหารทั่วไป</option>
+                            <option value="กลุ่มบริหารทั่วไป">กลุ่มกิจการนักเรียน</option>
                             <option value="กลุ่มสาระฯ ภาษาไทย">กลุ่มสาระฯ ภาษาไทย</option>
                             <option value="กลุ่มสาระฯ คณิตศาสตร์">กลุ่มสาระฯ คณิตศาสตร์</option>
                             <option value="กลุ่มสาระฯ วิทยาศาสตร์และเทคโนโลยี">กลุ่มสาระฯ วิทยาศาสตร์และเทคโนโลยี</option>
@@ -574,6 +575,7 @@
                             <option value="กลุ่มสาระฯ ศิลปะ">กลุ่มสาระฯ ศิลปะ</option>
                             <option value="กลุ่มสาระฯ การงานอาชีพ">กลุ่มสาระฯ การงานอาชีพ</option>
                             <option value="กลุ่มสาระฯ ภาษาต่างประเทศ">กลุ่มสาระฯ ภาษาต่างประเทศ</option>
+                            <option value="กลุ่มสาระฯ ภาษาต่างประเทศ">แนะแนว</option>
                             <option value="other">อื่นๆ (ระบุเอง)</option>
                         </select>
                     </div>
@@ -1197,7 +1199,7 @@
             .then(res => {
                 if (res.status === "success") {
                     returnModalObj.hide();
-                    Swal.fire({ icon: 'success', title: 'รับแฟ้มคืนเรียบร้อย แฟ้มพร้อมเสนอในรอบถัดไป', timer: 2000, showConfirmButton: false });
+                    Swal.fire({ icon: 'success', title: 'รับแฟ้มคืนเรียบร้อย', timer: 2000, showConfirmButton: false });
                     fetchFolders();
                 }
             });
