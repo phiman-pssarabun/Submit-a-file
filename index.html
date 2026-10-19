@@ -279,7 +279,7 @@
         </div>
         <div class="header-actions">
             <button class="btn-history" onclick="openHistoryModal()">
-                <i class="fas fa-history"></i> ประวัติการเสนอเซ็น
+                <i class="fas fa-history"></i> ประวัติย้อนหลัง 1 เดือน
             </button>
             <button class="btn-add-qr" onclick="openCreateQrModal()">
                 <i class="fas fa-qrcode"></i> สร้าง QR Code แฟ้มใหม่
@@ -332,23 +332,24 @@
     <div id="folderCardBody" class="mobile-card-container"></div>
 </div>
 
-<!-- Modal History: ประวัติการเสนอเซ็นย้อนหลัง -->
+<!-- Modal History: ประวัติการเสนอเซ็นย้อนหลัง 1 เดือน -->
 <div class="modal fade" id="historyModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold"><i class="fas fa-history me-2"></i>ประวัติการเสนอเซ็นแฟ้มทั้งหมด</h5>
+                <h5 class="modal-title font-weight-bold"><i class="fas fa-history me-2"></i>ประวัติการเสนอเซ็นแฟ้มย้อนหลัง 1 เดือน</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-3">
                 <div class="mb-3">
-                    <input type="text" id="historySearchInput" class="form-control" placeholder="พิมพ์เพื่อค้นหาประวัติ (รหัสแฟ้ม, กลุ่มงาน, ผู้เสนอ, ผู้รับคืน)..." onkeyup="filterHistory()">
+                    <input type="text" id="historySearchInput" class="form-control" placeholder="พิมพ์เพื่อค้นหาประวัติ (เช่น พิมพ์รหัสแฟ้ม F001, กลุ่มงาน, ผู้เสนอ, ผู้รับ)..." onkeyup="filterHistory()">
                 </div>
                 <div class="table-responsive" style="max-height: 450px;">
                     <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
                         <thead class="table-light sticky-top">
                             <tr>
                                 <th>รหัสแฟ้ม</th>
+                                <th>รอบที่</th>
                                 <th>กลุ่มงาน</th>
                                 <th>วันที่เสนอ / ผู้เสนอ</th>
                                 <th>วันที่ออกห้อง ผอ.</th>
@@ -358,7 +359,7 @@
                             </tr>
                         </thead>
                         <tbody id="historyTableBody">
-                            <tr><td colspan="7" class="text-center py-4 text-muted">กำลังโหลดประวัติ...</td></tr>
+                            <tr><td colspan="8" class="text-center py-4 text-muted">กำลังโหลดประวัติ...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -725,14 +726,14 @@
         renderFolders(filtered);
     }
 
-    /* ---- ระบบประวัติย้อนหลัง ---- */
+    /* ---- ระบบประวัติย้อนหลัง 1 เดือน ---- */
     function openHistoryModal() {
         historyModalObj.show();
         fetchHistory();
     }
 
     function fetchHistory() {
-        document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังดึงข้อมูลประวัติทั้งหมด...</td></tr>`;
+        document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังดึงข้อมูลประวัติย้อนหลัง 1 เดือน...</td></tr>`;
 
         fetch(`${GAS_URL}?action=getAllHistory`)
             .then(res => res.json())
@@ -743,14 +744,14 @@
                 }
             })
             .catch(() => {
-                document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">เกิดข้อผิดพลาดในการโหลดประวัติ</td></tr>`;
+                document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="8" class="text-center text-danger">เกิดข้อผิดพลาดในการโหลดประวัติ</td></tr>`;
             });
     }
 
     function renderHistory(data) {
         const tbody = document.getElementById('historyTableBody');
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">ยังไม่มีประวัติการเสนอเซ็นแฟ้ม</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">ไม่พบประวัติการเสนอเซ็นในช่วง 1 เดือนย้อนหลัง</td></tr>`;
             return;
         }
 
@@ -770,6 +771,7 @@
             html += `
                 <tr>
                     <td class="font-weight-bold text-primary">${item.folderId}</td>
+                    <td class="text-center"><span class="badge bg-light text-dark border">รอบที่ ${item.currentCycle || 1}</span></td>
                     <td>${item.group}</td>
                     <td><b>${item.submitter}</b><br><small class="text-muted">${item.submitDate}</small></td>
                     <td>${item.outDate || '-'}</td>
