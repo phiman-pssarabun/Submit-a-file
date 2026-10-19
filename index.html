@@ -86,14 +86,20 @@
             font-weight: 500;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
         .btn-add-qr {
             background: var(--main-gradient);
             color: white;
             border: none;
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 10px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             box-shadow: 0 4px 10px rgba(26, 82, 118, 0.2);
             transition: all 0.2s;
             display: flex;
@@ -101,7 +107,22 @@
             gap: 6px;
         }
 
-        .btn-add-qr:hover {
+        .btn-history {
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            box-shadow: 0 4px 10px rgba(71, 85, 105, 0.2);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-add-qr:hover, .btn-history:hover {
             opacity: 0.95;
             color: white;
             transform: translateY(-1px);
@@ -138,6 +159,7 @@
         }
         .bg-pending { background-color: #fef3c7; color: #92400e; }
         .bg-success-custom { background-color: #d1fae5; color: #065f46; }
+        .bg-returned { background-color: #e2e8f0; color: #334155; }
 
         /* Responsive View: Table for Desktop & Cards for Mobile */
         .desktop-table-container {
@@ -255,9 +277,14 @@
                 <p>โรงเรียนพิมานพิทยาสรรค์</p>
             </div>
         </div>
-        <button class="btn-add-qr" onclick="openCreateQrModal()">
-            <i class="fas fa-qrcode"></i> สร้าง QR Code แฟ้มใหม่
-        </button>
+        <div class="header-actions">
+            <button class="btn-history" onclick="openHistoryModal()">
+                <i class="fas fa-history"></i> ประวัติการเสนอเซ็น
+            </button>
+            <button class="btn-add-qr" onclick="openCreateQrModal()">
+                <i class="fas fa-qrcode"></i> สร้าง QR Code แฟ้มใหม่
+            </button>
+        </div>
     </div>
 
     <!-- Search & Filter Card -->
@@ -303,6 +330,41 @@
 
     <!-- Cards Container (Mobile) -->
     <div id="folderCardBody" class="mobile-card-container"></div>
+</div>
+
+<!-- Modal History: ประวัติการเสนอเซ็นย้อนหลัง -->
+<div class="modal fade" id="historyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold"><i class="fas fa-history me-2"></i>ประวัติการเสนอเซ็นแฟ้มทั้งหมด</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+                <div class="mb-3">
+                    <input type="text" id="historySearchInput" class="form-control" placeholder="พิมพ์เพื่อค้นหาประวัติ (รหัสแฟ้ม, กลุ่มงาน, ผู้เสนอ, ผู้รับคืน)..." onkeyup="filterHistory()">
+                </div>
+                <div class="table-responsive" style="max-height: 450px;">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>รหัสแฟ้ม</th>
+                                <th>กลุ่มงาน</th>
+                                <th>วันที่เสนอ / ผู้เสนอ</th>
+                                <th>วันที่ออกห้อง ผอ.</th>
+                                <th>ผู้รับคืน / วันที่รับ</th>
+                                <th>สถานะล่าสุด</th>
+                                <th>ลายเซ็น</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="7" class="text-center py-4 text-muted">กำลังโหลดประวัติ...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal 0: สร้าง QR Code ประจำแฟ้มใหม่ -->
@@ -400,7 +462,7 @@
     </div>
 </div>
 
-<!-- Modal 2: อัปเดตวันที่แฟ้มออกจากห้อง ผอ. (เพิ่มช่องยืนยันรหัสผ่านเจ้าหน้าที่) -->
+<!-- Modal 2: อัปเดตวันที่แฟ้มออกจากห้อง ผอ. -->
 <div class="modal fade" id="outDateModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
@@ -470,7 +532,8 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzEmWnymTjdAShNGGuKfzAyZ515gSKl1kb6iR_uJ0ZAWF-ARj0nIU43QA21FNyLwnsM/exec";
 
     let allFolders = [];
-    let createQrModalObj, submitModalObj, outDateModalObj, returnModalObj;
+    let allHistoryData = [];
+    let createQrModalObj, submitModalObj, outDateModalObj, returnModalObj, historyModalObj;
     let signaturePad;
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -478,6 +541,7 @@
         submitModalObj = new bootstrap.Modal(document.getElementById('submitModal'));
         outDateModalObj = new bootstrap.Modal(document.getElementById('outDateModal'));
         returnModalObj = new bootstrap.Modal(document.getElementById('returnModal'));
+        historyModalObj = new bootstrap.Modal(document.getElementById('historyModal'));
 
         const canvas = document.getElementById('signature-pad');
         signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
@@ -532,7 +596,6 @@
         const folderId = document.getElementById('newFolderId').value.trim();
         const selectGroup = document.getElementById('newGroup').value;
         const customGroup = document.getElementById('customGroupName').value.trim();
-        
         const finalGroup = selectGroup === 'other' ? customGroup : selectGroup;
 
         if (!finalGroup) {
@@ -559,11 +622,7 @@
                 if (res.status === "success") {
                     const qrContainer = document.getElementById('qrcode');
                     qrContainer.innerHTML = "";
-                    new QRCode(qrContainer, {
-                        text: qrUrl,
-                        width: 160,
-                        height: 160
-                    });
+                    new QRCode(qrContainer, { text: qrUrl, width: 160, height: 160 });
 
                     document.getElementById('previewGroup').innerText = finalGroup;
                     document.getElementById('previewFolderId').innerText = `รหัสแฟ้ม: ${folderId}`;
@@ -666,6 +725,87 @@
         renderFolders(filtered);
     }
 
+    /* ---- ระบบประวัติย้อนหลัง ---- */
+    function openHistoryModal() {
+        historyModalObj.show();
+        fetchHistory();
+    }
+
+    function fetchHistory() {
+        document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>กำลังดึงข้อมูลประวัติทั้งหมด...</td></tr>`;
+
+        fetch(`${GAS_URL}?action=getAllHistory`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    allHistoryData = res.data;
+                    renderHistory(allHistoryData);
+                }
+            })
+            .catch(() => {
+                document.getElementById('historyTableBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">เกิดข้อผิดพลาดในการโหลดประวัติ</td></tr>`;
+            });
+    }
+
+    function renderHistory(data) {
+        const tbody = document.getElementById('historyTableBody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">ยังไม่มีประวัติการเสนอเซ็นแฟ้ม</td></tr>`;
+            return;
+        }
+
+        let html = "";
+        data.forEach(item => {
+            let statusBadge = `<span class="badge-status bg-returned">คืนแล้ว (${item.receiveDate})</span>`;
+            if (item.status === "เสนอผู้อำนวยการเพื่อพิจารณา") {
+                statusBadge = `<span class="badge-status bg-pending">กำลังเสนอ ผอ.</span>`;
+            } else if (item.status === "พิจารณาเรียบร้อยแล้ว") {
+                statusBadge = `<span class="badge-status bg-success-custom">พิจารณาแล้ว (รอคืน)</span>`;
+            }
+
+            const sigBtn = item.signature 
+                ? `<button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="viewSignature('${item.signature}')"><i class="fas fa-file-signature"></i> ดู</button>` 
+                : `-`;
+
+            html += `
+                <tr>
+                    <td class="font-weight-bold text-primary">${item.folderId}</td>
+                    <td>${item.group}</td>
+                    <td><b>${item.submitter}</b><br><small class="text-muted">${item.submitDate}</small></td>
+                    <td>${item.outDate || '-'}</td>
+                    <td><b>${item.receiverName}</b><br><small class="text-muted">${item.receiveDate !== '-' ? item.receiveDate : ''}</small></td>
+                    <td>${statusBadge}</td>
+                    <td>${sigBtn}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    function filterHistory() {
+        const searchText = document.getElementById('historySearchInput').value.toLowerCase();
+        const filtered = allHistoryData.filter(item => {
+            return (
+                item.folderId.toLowerCase().includes(searchText) ||
+                item.group.toLowerCase().includes(searchText) ||
+                item.submitter.toLowerCase().includes(searchText) ||
+                item.receiverName.toLowerCase().includes(searchText) ||
+                item.submitDate.toLowerCase().includes(searchText)
+            );
+        });
+        renderHistory(filtered);
+    }
+
+    function viewSignature(sigBase64) {
+        Swal.fire({
+            title: 'ลายมือชื่อผู้รับคืน',
+            imageUrl: sigBase64,
+            imageAlt: 'ลายมือชื่อผู้รับคืน',
+            confirmButtonColor: '#1a5276'
+        });
+    }
+
     function checkScannedQR(folderId) {
         Swal.fire({ title: 'กำลังตรวจสอบข้อมูลแฟ้ม...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
@@ -714,7 +854,6 @@
             });
     }
 
-    // เปิด Modal ลงวันที่ออก (พร้อมล้างช่องรหัสผ่าน)
     function openOutDateModal(rowIndex) {
         document.getElementById('outRowIndex').value = rowIndex;
         document.getElementById('outDateInput').valueAsDate = new Date();
@@ -722,7 +861,6 @@
         outDateModalObj.show();
     }
 
-    // บันทึกวันที่ออกและส่งรหัสผ่านไปตรวจสอบ
     function saveOutDate(e) {
         e.preventDefault();
         Swal.fire({ title: 'กำลังอัปเดตสถานะ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
